@@ -4,7 +4,6 @@ create table Student (
     student_email varchar(100),
     enrolled_on date
 );
-
 create table Book (
     bid int primary key auto_increment,
     book_title varchar(200),
@@ -12,7 +11,6 @@ create table Book (
     genre varchar(50),
     stock int
 );
-
 create table BorrowRecord (
     record_id int primary key auto_increment,
     sid int,
@@ -22,7 +20,6 @@ create table BorrowRecord (
     foreign key (sid) references Student(sid),
     foreign key (bid) references Book(bid)
 );
-
 insert into Student (full_name, student_email, enrolled_on) values
 ('Sai Teja Kasoju', 'kasojusaiteja10@gmail.com', '2023-07-01'),
 ('Akhil Reddy', 'akhilreddy@gmail.com', '2022-09-15'),
@@ -48,23 +45,22 @@ insert into BorrowRecord (sid, bid, borrow_date, return_date) values
 (2, 6, curdate() - interval 2 day, null),
 (3, 5, '2020-05-10', '2020-05-18');
 
--- students who have not returned books for more than 14 days
-select s.full_name, b.book_title, br.borrow_date,
-       datediff(curdate(), br.borrow_date) as days_pending
+--1.
+select s.full_name, b.book_title, br.borrow_date,datediff(curdate(), br.borrow_date) as days_pending
 from BorrowRecord br
 join Student s on br.sid = s.sid
 join Book b on br.bid = b.bid
 where br.return_date is null
 and datediff(curdate(), br.borrow_date) > 14;
 
--- most borrowed genre
+--2.
 select b.genre, count(*) as borrow_count
 from BorrowRecord br
 join Book b on br.bid = b.bid
 group by b.genre
 order by borrow_count desc;
 
--- remove students inactive for more than 3 years
+-- 3.
 delete from Student
 where sid not in (
     select distinct sid
